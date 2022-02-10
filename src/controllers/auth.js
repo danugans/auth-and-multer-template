@@ -11,9 +11,9 @@ const jwt = require("jsonwebtoken");
 exports.register = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    name: Joi.string().min(5).required(),
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    name: Joi.string().min(4).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -41,13 +41,13 @@ exports.register = async (req, res) => {
 
     // generate token
     const token = jwt.sign({ id: user.id }, process.env.TOKEN_KEY);
-    
+
     res.status(200).send({
       status: "success...",
       data: {
         name: newUser.name,
         email: newUser.email,
-        token
+        token,
       },
     });
   } catch (error) {
@@ -62,8 +62,8 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -105,7 +105,7 @@ exports.login = async (req, res) => {
       data: {
         name: userExist.name,
         email: userExist.email,
-        token
+        token,
       },
     });
   } catch (error) {
