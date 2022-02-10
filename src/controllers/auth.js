@@ -7,13 +7,14 @@ const Joi = require("joi");
 const bcrypt = require("bcrypt");
 
 // import package here
+const jwt = require("jsonwebtoken");
 
 exports.register = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    name: Joi.string().min(5).required(),
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    name: Joi.string().min(4).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -61,8 +62,8 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -97,6 +98,16 @@ exports.login = async (req, res) => {
     }
 
     // code here
+    const tokenData = {
+      id: userExist.id,
+      name: userExist.name,
+      email: userExist.email,
+      status: userExist.status,
+    };
+
+    const SECRET_KEY = "ApaAjaBolehGan";
+
+    const token = jwt.sign(tokenData, SECRET_KEY);
 
     res.status(200).send({
       status: "success...",
@@ -104,6 +115,7 @@ exports.login = async (req, res) => {
         name: userExist.name,
         email: userExist.email,
         // code here
+        token,
       },
     });
   } catch (error) {
