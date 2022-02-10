@@ -5,13 +5,14 @@ const { user } = require("../../models");
 const Joi = require("joi");
 
 // import package here
+const bcrypt = require("bcrypt");
 
 exports.register = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    name: Joi.string().min(5).required(),
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    name: Joi.string().min(4).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -27,6 +28,8 @@ exports.register = async (req, res) => {
 
   try {
     // code here
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     const newUser = await user.create({
       name: req.body.name,
@@ -53,8 +56,8 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   // our validation schema here
   const schema = Joi.object({
-    email: Joi.string().email().min(6).required(),
-    password: Joi.string().min(6).required(),
+    email: Joi.string().email().min(4).required(),
+    password: Joi.string().min(3).required(),
   });
 
   // do validation and get error object from schema.validate
@@ -78,6 +81,14 @@ exports.login = async (req, res) => {
       },
     });
     // code here
+    const isMatching = await bcrypt.compare(req.body.password, userExist.password);
+
+    if (!isMatching) {
+      return res.status(400).send({
+        status: "failed",
+        message: "credential is invalid",
+      });
+    }
 
     res.status(200).send({
       status: "success...",
